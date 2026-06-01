@@ -130,14 +130,13 @@ export default function ServicesStack() {
           // Card 1 sticks at 100px, Card 2 sticks at 180px, Card 3 at 260px, etc.
           // This leaves exactly an 80px header band of the previous card visible when stacked!
           const stickyTop = 100 + index * 80;
-          const isLastCard = index === SERVICES.length - 1;
 
           return (
             <div
               key={service.id}
               style={{ 
-                position: isLastCard ? 'relative' : 'sticky', 
-                top: isLastCard ? undefined : `${stickyTop}px`,
+                position: 'sticky', 
+                top: `${stickyTop}px`,
                 zIndex: (index + 1) * 10 
               }}
               className="w-full bg-[#fcfcfc] border-t border-[#dddddd] shadow-[0_-1px_0_rgba(0,0,0,0.05)]"
