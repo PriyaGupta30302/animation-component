@@ -1,11 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { useSelectedWorkAnimation } from './SelectedWorkAnimation';
 
 interface ProjectItem {
   id: string;
@@ -37,93 +33,29 @@ const PROJECTS: ProjectItem[] = [
     year: '2026',
     image: '/web_development.png',
   },
+  {
+    id: 'quantum-lab',
+    brand: 'Quantum Lab',
+    industry: 'AI Research Platform',
+    year: '2026',
+    image: '/mobile_app.png',
+  },
+  {
+    id: 'urban-flora',
+    brand: 'Urban Flora',
+    industry: 'Sustainable Landscape',
+    year: '2027',
+    image: '/branding_mockup.png',
+  },
 ];
 
 export default function SelectedWork() {
   const containerRef = useRef<HTMLDivElement>(null);
-
-  useGSAP(() => {
-    if (!containerRef.current) return;
-
-    // 1. Header entrance animations
-    gsap.fromTo('.heading-text',
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 1.2, ease: 'power4.out', stagger: 0.2 }
-    );
-
-    // 2. Setup ScrollTriggers for each project container
-    const cards = gsap.utils.toArray('.project-card');
-    cards.forEach((card: any, index: number) => {
-      const largeImage = card.querySelector('.project-large-image');
-      const largeImageWrapper = card.querySelector('.project-image-wrapper');
-      const thumbnail = card.querySelector('.header-thumbnail');
-      const viewProjectBtn = card.querySelector('.view-project-btn');
-
-      if (!largeImage || !largeImageWrapper || !thumbnail) return;
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: card,
-          start: 'top bottom', // Start animating when card top reaches bottom of viewport
-          end: 'bottom top',   // End when card bottom leaves top of viewport
-          scrub: 1,            // Smooth scrub rate
-        }
-      });
-
-      // Phase 1: Entrance (Smooth scale up / zoom-out from left as it enters)
-      tl.fromTo(largeImageWrapper,
-        { 
-          scale: 0.6, 
-          clipPath: 'inset(0% 100% 0% 0%)', // Reveal from left side
-          opacity: 0 
-        },
-        { 
-          scale: 1, 
-          clipPath: 'inset(0% 0% 0% 0%)',
-          opacity: 1,
-          duration: 0.4,
-          ease: 'sine.out'
-        }
-      );
-
-      // Phase 2: Active Hover/Scroll Zoom in/out
-      tl.to(largeImage, {
-        scale: 1.15,
-        duration: 0.3,
-        ease: 'none'
-      });
-
-      // Phase 3: Exit/Shrink into Sticky Header (Shrink to thumbnail)
-      // As the card moves past, the large image shrinks completely
-      // and the tiny thumbnail in the sticky header scales up in sync!
-      tl.to(largeImageWrapper, {
-        scale: 0,
-        opacity: 0,
-        y: -100,
-        duration: 0.3,
-        ease: 'power2.inOut'
-      })
-      .to(thumbnail, {
-        scale: 1,
-        opacity: 1,
-        duration: 0.2,
-        ease: 'back.out(1.5)'
-      }, '-=0.2');
-
-      if (viewProjectBtn) {
-        tl.to(viewProjectBtn, {
-          scale: 0,
-          opacity: 0,
-          duration: 0.1
-        }, '-=0.3');
-      }
-    });
-
-  }, { scope: containerRef });
+  useSelectedWorkAnimation(containerRef);
 
   return (
     <div ref={containerRef} className="w-full bg-[#fcfcfc] text-[#111111] py-20 border-t border-[#dddddd]">
-      
+
       {/* (Selected) Work Heading */}
       <div className="w-full px-6 md:px-16 lg:px-24 mb-10 flex flex-col md:flex-row justify-between items-start md:items-end">
         <h2 className="heading-text text-5xl md:text-8xl lg:text-9xl font-light tracking-tight font-serif text-[#111111] leading-none">
@@ -151,12 +83,12 @@ export default function SelectedWork() {
       </div>
 
       {/* Column Titles Bar */}
-      <div className="w-full px-6 md:px-16 lg:px-24 border-t border-b border-[#eeeeee] py-4 bg-[#fcfcfc]">
-        <div className="grid grid-cols-[1.5fr_2fr_1fr_80px] gap-4 w-full text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
+      <div className="w-full border-b border-black p-4 bg-[#fcfcfc] sticky top-0 z-50">
+        <div className="grid grid-cols-[1.5fr_2fr_1fr_80px] gap-4 w-full text-[18px] text-black font-sans font-medium">
           <span>Brand</span>
           <span className="text-center">Industry</span>
           <span className="text-right">Year</span>
-          <span className="text-right pr-2">Preview</span>
+          <span className="text-right pr-2"></span>
         </div>
       </div>
 
@@ -165,36 +97,35 @@ export default function SelectedWork() {
         {PROJECTS.map((project, index) => {
           // Staggered sticky header tops
           // Each header is sticky right underneath the previous one!
-          const headerHeight = 60;
-          const stickyTop = 100 + index * headerHeight;
+          const headerHeight = 50;
+          const stickyTop = (index + 1) * headerHeight;
+          const headerZIndex = 50 - index;
+          const imageZIndex = 40 - index;
 
           return (
-            <div
-              key={project.id}
-              className="project-card w-full flex flex-col relative border-b border-[#eeeeee]"
-            >
+            <div key={project.id} className="contents">
               {/* Sticky Header Bar */}
               <div
                 style={{
                   position: 'sticky',
                   top: `${stickyTop}px`,
-                  zIndex: (index + 1) * 10,
+                  zIndex: headerZIndex,
                 }}
-                className="w-full bg-[#fcfcfc] border-b border-[#eeeeee] py-5 px-6 md:px-16 lg:px-24 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
+                className="w-full bg-[#fcfcfc] border-b border-black p-4 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
               >
                 <div className="grid grid-cols-[1.5fr_2fr_1fr_80px] gap-4 items-center w-full">
                   {/* Brand */}
-                  <span className="text-base md:text-lg font-light text-[#111111]">
+                  <span className="text-[18px] font-normal text-black font-sans">
                     {project.brand}
                   </span>
-                  
+
                   {/* Industry */}
-                  <span className="text-center text-sm md:text-base font-light text-neutral-600">
+                  <span className="text-center text-[18px] font-normal text-black font-sans">
                     {project.industry}
                   </span>
-                  
+
                   {/* Year */}
-                  <span className="text-right text-sm md:text-base font-mono text-neutral-500">
+                  <span className="text-right text-[18px] font-normal text-black font-sans">
                     {project.year}
                   </span>
 
@@ -213,27 +144,32 @@ export default function SelectedWork() {
                 </div>
               </div>
 
-              {/* Card Main Body content (large image & button) */}
-              <div className="w-full px-6 md:px-16 lg:px-24 py-16 flex flex-col md:flex-row items-center md:items-end justify-between gap-12 bg-[#fcfcfc]/50 min-h-[60vh]">
+              {/* Card Main Body content (large full-width image & overlay button) */}
+              <div className="project-card w-full py-0 bg-[#fcfcfc]/50 relative border-b border-[#eeeeee] min-h-[160vh]">
                 {/* Large Image Frame (Scales and shrinks based on scroll position) */}
-                <div 
-                  className="project-image-wrapper w-full md:w-[65%] h-[350px] md:h-[450px] overflow-hidden rounded-md bg-[#eeeeee] shadow-sm relative"
+                <div
+                  style={{
+                    position: 'sticky',
+                    top: `${stickyTop + headerHeight}px`,
+                    zIndex: imageZIndex,
+                  }}
+                  className="project-image-wrapper w-full h-[350px] md:h-[600px] overflow-hidden bg-[#eeeeee] shadow-sm relative ml-0 mr-auto"
                 >
                   <img
                     src={project.image}
                     alt={project.brand}
                     className="project-large-image w-full h-full object-cover origin-center"
                   />
-                </div>
 
-                {/* Interactive circular View Project CTA */}
-                <div className="w-full md:w-[30%] flex justify-center md:justify-end pr-6 pb-6">
-                  <div 
-                    className="view-project-btn w-28 h-28 md:w-36 md:h-36 rounded-full border border-neutral-300 hover:border-neutral-900 transition-colors flex items-center justify-center cursor-pointer group bg-white shadow-sm"
-                  >
-                    <span className="text-xs md:text-sm font-mono tracking-wider text-neutral-700 group-hover:text-neutral-900 text-center">
-                      View<br />Project
-                    </span>
+                  {/* Interactive circular View Project CTA overlay */}
+                  <div className="absolute right-6 md:right-12 top-1/2 -translate-y-1/2 z-20">
+                    <div
+                      className="view-project-btn w-24 h-24 md:w-32 md:h-32 rounded-full border border-neutral-200/60 bg-white shadow-md flex items-center justify-center cursor-pointer group hover:scale-105 hover:border-neutral-900 transition-all duration-300"
+                    >
+                      <span className="text-xs md:text-sm font-sans font-medium tracking-wider text-neutral-800 group-hover:text-neutral-900 text-center">
+                        View<br />Project
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

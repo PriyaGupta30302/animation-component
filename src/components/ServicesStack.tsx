@@ -115,10 +115,10 @@ export default function ServicesStack() {
   }, { scope: containerRef });
 
   return (
-    <div ref={containerRef} className="w-full bg-[#fcfcfc] text-[#111111] py-20">
+    <div ref={containerRef} className="w-full bg-[#fcfcfc] text-[#111111] py-0">
       {/* 1. Header Section */}
       <div className="w-full mb-16 px-6 md:px-16 lg:px-24">
-        <h2 className="services-header-title text-5xl md:text-7xl font-light tracking-tight text-[#111111] font-serif pb-6">
+        <h2 className="services-header-title text-5xl md:text-7xl font-light tracking-tight text-[#111111] font-serif pb-0">
           Our Services
         </h2>
       </div>
