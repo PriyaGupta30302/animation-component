@@ -6,6 +6,7 @@ export default function Home() {
     <main className="min-h-screen w-full bg-[#fcfcfc] overflow-x-clip">
       <ServicesStack />
       <SelectedWork />
+      <ServicesStack />
     </main>
   );
 }

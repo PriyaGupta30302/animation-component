@@ -21,13 +21,36 @@ export function useSelectedWorkAnimation(containerRef: RefObject<HTMLDivElement 
     const cards = gsap.utils.toArray('.project-card');
     if (cards.length === 0) return;
 
-    const wrappers = cards.map((card: any) => card.querySelector('.project-image-wrapper'));
-    const thumbnails = document.querySelectorAll('.header-thumbnail');
-    const buttons = cards.map((card: any) => card.querySelector('.view-project-btn'));
+    const wrappers = gsap.utils.toArray('.project-image-wrapper') as any[];
+    const thumbnails = gsap.utils.toArray('.header-thumbnail') as any[];
+    const buttons = gsap.utils.toArray('.view-project-btn') as any[];
+    const headers = gsap.utils.toArray('.project-header') as any[];
 
     // Set initial states
-    wrappers.forEach((wrapper: any) => {
-      if (wrapper) gsap.set(wrapper, { clipPath: 'polygon(0% 100%, 0% 100%, 0% 100%, 0% 100%)' });
+    wrappers.forEach((wrapper: any, idx: number) => {
+      if (wrapper) {
+        const H = wrapper.offsetHeight || 600;
+        const headerHeight = 50;
+        const stickyTop = (idx + 1) * headerHeight;
+        const Y = stickyTop + headerHeight;
+
+        gsap.set(wrapper, {
+          width: '0%',
+          height: '0px',
+          top: `${Y + H}px`, // Starts at the bottom-left corner of its active slot
+          left: '0',
+          right: 'auto',
+          marginLeft: '0',
+          marginRight: 'auto',
+        });
+
+        // Initialize header to bottom edge of active slot
+        if (headers[idx]) {
+          gsap.set(headers[idx], {
+            top: idx === 0 ? `${stickyTop}px` : `${Y + H - headerHeight}px`,
+          });
+        }
+      }
     });
 
     gsap.set('.header-thumbnail', { scale: 0, opacity: 0 });
@@ -35,6 +58,8 @@ export function useSelectedWorkAnimation(containerRef: RefObject<HTMLDivElement 
     buttons.forEach((btn: any) => {
       if (btn) gsap.set(btn, { scale: 0, opacity: 0 });
     });
+
+
 
     // --- Dynamic 3-Phase Animation Loop for all cards ---
     for (let i = 0; i < cards.length; i++) {
@@ -45,7 +70,9 @@ export function useSelectedWorkAnimation(containerRef: RefObject<HTMLDivElement 
       if (!wrapper) continue;
 
       const headerHeight = 50;
-      const stickyTop = (i * headerHeight) + 50;
+      const stickyTop = (i + 1) * headerHeight;
+      const Y = stickyTop + headerHeight;
+      const H = wrapper.offsetHeight || 600;
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -58,92 +85,93 @@ export function useSelectedWorkAnimation(containerRef: RefObject<HTMLDivElement 
 
       if (i === 0) {
         // --- Card 0 (Eon Studio): First Card Special Entrance ---
-        // 1. Entrance (0.0 to 0.4): grows diagonally from bottom-left corner to full-bleed
-        tl.fromTo(wrapper,
-          { clipPath: 'polygon(0% 100%, 0% 100%, 0% 100%, 0% 100%)' },
-          {
-            clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
-            duration: 0.4,
-            ease: 'none',
-          },
-          0
-        );
+        tl.to(wrapper, {
+          width: '100%',
+          height: `${H}px`,
+          top: `${Y}px`,
+          duration: 0.6,
+          ease: 'none',
+        }, 0);
 
         if (btn) {
           tl.to(btn, {
             scale: 1,
             opacity: 1,
-            duration: 0.4,
+            duration: 0.6,
             ease: 'none',
           }, 0);
         }
 
-        // 2. Active Stay (0.4 to 1.0): remains fully visible
-        tl.to({}, { duration: 0.6 }, 0.4);
+        // Active Stay (0.6 to 1.0)
+        tl.to({}, { duration: 0.4 }, 0.6);
 
       } else {
-        // --- Subsequent Cards (Index i > 0): Exit of i-1 & Entrance of i ---
+        // --- Card i (i > 0): Symmetrical crossover of Card i-1 and Card i ---
         const prevWrapper = wrappers[i - 1];
         const prevThumbnail = thumbnails[i - 1];
         const prevBtn = buttons[i - 1];
 
-        // 1. Initial Stay (0.0 to 0.2): prev card remains fully visible
-        tl.to({}, { duration: 0.2 }, 0);
+        // 1. Initial Stay (0.0 to 0.1): previous card stays at 100%
+        tl.to({}, { duration: 0.1 }, 0);
 
-        // 2. The Symmetrical Crossover (0.2 to 0.8):
-        // prev wrapper shrinks diagonally towards the bottom-right corner
-        // current wrapper grows diagonally from the bottom-left corner
+        // 2. Symmetrical Crossover (0.1 to 0.9): Previous card vanishes, current expands
         if (prevWrapper) {
-          tl.fromTo(prevWrapper,
-            { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' },
-            {
-              clipPath: 'polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%)',
-              duration: 0.6,
+          tl.set(prevWrapper, { left: 'auto', right: '0' }, 0.1)
+            .to(prevWrapper, {
+              width: '0%',
+              height: '0px',
+              duration: 0.8,
               ease: 'none',
-            },
-            0.2
-          );
+            }, 0.1);
         }
 
-        tl.fromTo(wrapper,
-          { clipPath: 'polygon(0% 100%, 0% 100%, 0% 100%, 0% 100%)' },
-          {
-            clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
-            duration: 0.6,
-            ease: 'none',
-          },
-          0.2
-        );
+        tl.to(wrapper, {
+          width: '100%',
+          height: `${H}px`,
+          top: `${Y}px`,
+          duration: 0.8,
+          ease: 'none',
+        }, 0.1);
 
         if (prevThumbnail) {
           tl.to(prevThumbnail, {
             scale: 1,
             opacity: 1,
-            duration: 0.6,
+            duration: 0.8,
             ease: 'none',
-          }, 0.2);
+          }, 0.1);
         }
 
         if (prevBtn) {
           tl.to(prevBtn, {
             scale: 0,
             opacity: 0,
-            duration: 0.6,
+            duration: 0.8,
             ease: 'none',
-          }, 0.2);
+          }, 0.1);
         }
 
         if (btn) {
           tl.to(btn, {
             scale: 1,
             opacity: 1,
-            duration: 0.6,
+            duration: 0.8,
             ease: 'none',
-          }, 0.2);
+          }, 0.1);
         }
 
-        // 3. Final Active Stay (0.8 to 1.0): current card remains fully visible
-        tl.to({}, { duration: 0.2 }, 0.8);
+        if (headers[i]) {
+          tl.to(headers[i], {
+            top: `${stickyTop}px`,
+            duration: 0.8,
+            ease: 'none',
+          }, 0.1);
+        }
+
+
+
+        // 3. Final Active Stay (0.9 to 1.0)
+        tl.to({}, { duration: 0.1 }, 0.9);
       }
     }
 

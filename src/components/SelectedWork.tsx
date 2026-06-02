@@ -94,77 +94,86 @@ export default function SelectedWork() {
 
       {/* Projects List Container */}
       <div className="w-full flex flex-col relative">
-        {PROJECTS.map((project, index) => {
-          // Staggered sticky header tops
-          // Each header is sticky right underneath the previous one!
-          const headerHeight = 50;
-          const stickyTop = (index + 1) * headerHeight;
-          const headerZIndex = 50 - index;
-          const imageZIndex = 40 - index;
+        {/* Shared Sticky Viewport for all Images, Buttons, and Headers */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="sticky top-0 h-screen w-full overflow-hidden">
+            {PROJECTS.map((project, index) => {
+              const headerHeight = 50;
+              const stickyTop = (index + 1) * headerHeight;
+              const headerZIndex = 50 - index;
+              const imageZIndex = 40 - index;
 
-          return (
-            <div key={project.id} className="contents">
-              {/* Sticky Header Bar */}
-              <div
-                style={{
-                  position: 'sticky',
-                  top: `${stickyTop}px`,
-                  zIndex: headerZIndex,
-                }}
-                className="w-full bg-[#fcfcfc] border-b border-black p-4 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
-              >
-                <div className="grid grid-cols-[1.5fr_2fr_1fr_80px] gap-4 items-center w-full">
-                  {/* Brand */}
-                  <span className="text-[18px] font-normal text-black font-sans">
-                    {project.brand}
-                  </span>
+              return (
+                <div key={project.id} className="absolute inset-0 pointer-events-none">
+                  {/* Sticky Header Bar */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: `${stickyTop}px`,
+                      zIndex: headerZIndex,
+                    }}
+                    className="project-header w-full bg-[#fcfcfc] border-t border-[#dddddd] border-b border-black p-4 shadow-[0_1px_0_rgba(0,0,0,0.02)] pointer-events-auto"
+                  >
+                    <div className="grid grid-cols-[1.5fr_2fr_1fr_80px] gap-4 items-center w-full">
+                      {/* Brand */}
+                      <span className="text-[18px] font-normal text-black font-sans">
+                        {project.brand}
+                      </span>
 
-                  {/* Industry */}
-                  <span className="text-center text-[18px] font-normal text-black font-sans">
-                    {project.industry}
-                  </span>
+                      {/* Industry */}
+                      <span className="text-center text-[18px] font-normal text-black font-sans">
+                        {project.industry}
+                      </span>
 
-                  {/* Year */}
-                  <span className="text-right text-[18px] font-normal text-black font-sans">
-                    {project.year}
-                  </span>
+                      {/* Year */}
+                      <span className="text-right text-[18px] font-normal text-black font-sans">
+                        {project.year}
+                      </span>
 
-                  {/* Thumbnail slot on the far right (fades in as large image collapses) */}
-                  <div className="flex justify-end items-center pr-2">
-                    <div
-                      className="header-thumbnail w-[50px] h-[30px] rounded-[3px] overflow-hidden bg-neutral-200 border border-neutral-300/40 shadow-inner scale-0 opacity-0 origin-right transition-transform"
-                    >
-                      <img
-                        src={project.image}
-                        alt="Thumbnail"
-                        className="w-full h-full object-cover"
-                      />
+                      {/* Thumbnail slot on the far right (fades in as large image collapses) */}
+                      <div className="flex justify-end items-center pr-2">
+                        <div
+                          className="header-thumbnail w-[50px] h-[30px] rounded-[3px] overflow-hidden bg-neutral-200 border border-neutral-300/40 shadow-inner scale-0 opacity-0 origin-right transition-transform"
+                        >
+                          <img
+                            src={project.image}
+                            alt="Thumbnail"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Card Main Body content (large full-width image & overlay button) */}
-              <div className="project-card w-full py-0 bg-[#fcfcfc]/50 relative border-b border-[#eeeeee] min-h-[220vh]">
-                {/* Large Image Frame (Scales and shrinks based on scroll position) */}
-                <div
-                  style={{
-                    position: 'sticky',
-                    top: `${stickyTop + headerHeight}px`,
-                    zIndex: imageZIndex,
-                  }}
-                  className="project-image-wrapper w-full h-[350px] md:h-[600px] overflow-hidden bg-[#eeeeee] shadow-sm relative"
-                >
-                  <img
-                    src={project.image}
-                    alt={project.brand}
-                    className="project-large-image w-full h-full object-cover origin-center"
-                  />
+                  {/* Large Image Frame (Scales and shrinks based on scroll position) */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: `${stickyTop + headerHeight}px`,
+                      zIndex: imageZIndex,
+                    }}
+                    className="project-image-wrapper w-full h-[350px] md:h-[600px] overflow-hidden bg-[#eeeeee] shadow-sm ml-0 mr-auto pointer-events-auto"
+                  >
+                    <img
+                      src={project.image}
+                      alt={project.brand}
+                      className="project-large-image w-full h-full object-cover origin-center"
+                    />
+                  </div>
 
                   {/* Interactive circular View Project CTA overlay */}
-                  <div className="absolute right-6 md:right-12 top-1/2 -translate-y-1/2 z-20">
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: `${stickyTop + headerHeight + 236}px`,
+                      zIndex: imageZIndex + 1,
+                    }}
+                    className={`project-btn-wrapper w-full flex items-center ${
+                      index % 2 === 0 ? 'justify-start' : 'justify-end'
+                    } px-6 md:px-12 lg:px-24 pointer-events-none`}
+                  >
                     <div
-                      className="view-project-btn w-24 h-24 md:w-32 md:h-32 rounded-full border border-neutral-200/60 bg-white shadow-md flex items-center justify-center cursor-pointer group hover:scale-105 hover:border-neutral-900 transition-all duration-300"
+                      className="view-project-btn w-24 h-24 md:w-32 md:h-32 rounded-full border border-neutral-200/60 bg-white shadow-md flex items-center justify-center cursor-pointer group hover:scale-105 hover:border-neutral-900 transition-all duration-300 pointer-events-auto"
                     >
                       <span className="text-xs md:text-sm font-sans font-medium tracking-wider text-neutral-800 group-hover:text-neutral-900 text-center">
                         View<br />Project
@@ -172,7 +181,17 @@ export default function SelectedWork() {
                     </div>
                   </div>
                 </div>
-              </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Normal scroll flow headers and triggers */}
+        {PROJECTS.map((project, index) => {
+          return (
+            <div key={project.id} className="contents">
+              {/* Card Main Body spacer (purely for ScrollTrigger height tracking) */}
+              <div className="project-card w-full py-0 bg-transparent relative border-b border-transparent min-h-[120vh]" />
             </div>
           );
         })}
