@@ -83,7 +83,7 @@ export default function SelectedWork() {
       </div>
 
       {/* Column Titles Bar */}
-      <div className="w-full border-b border-black p-4 bg-[#fcfcfc] sticky top-0 z-50">
+      <div className="w-full border-b border-black py-2 px-4 bg-[#fcfcfc] sticky top-0 z-50">
         <div className="grid grid-cols-[1.5fr_2fr_1fr_80px] gap-4 w-full text-[18px] text-black font-sans font-medium">
           <span>Brand</span>
           <span className="text-center">Industry</span>
@@ -98,7 +98,7 @@ export default function SelectedWork() {
         <div className="absolute inset-0 pointer-events-none">
           <div className="sticky top-0 h-screen w-full overflow-hidden">
             {PROJECTS.map((project, index) => {
-              const headerHeight = 50;
+              const headerHeight = 44;
               const stickyTop = (index + 1) * headerHeight;
               const headerZIndex = 50 - index;
               const imageZIndex = 40 - index;
@@ -112,21 +112,21 @@ export default function SelectedWork() {
                       top: `${stickyTop}px`,
                       zIndex: headerZIndex,
                     }}
-                    className="project-header w-full bg-[#fcfcfc] border-t border-[#dddddd] border-b border-black p-4 shadow-[0_1px_0_rgba(0,0,0,0.02)] pointer-events-auto"
+                    className="project-header w-full bg-[#fcfcfc] border-b border-black py-2 px-4 pointer-events-auto"
                   >
                     <div className="grid grid-cols-[1.5fr_2fr_1fr_80px] gap-4 items-center w-full">
                       {/* Brand */}
-                      <span className="text-[18px] font-normal text-black font-sans">
+                      <span className="text-[16px] font-normal text-black font-sans">
                         {project.brand}
                       </span>
 
                       {/* Industry */}
-                      <span className="text-center text-[18px] font-normal text-black font-sans">
+                      <span className="text-center text-[16px] font-normal text-black font-sans">
                         {project.industry}
                       </span>
 
                       {/* Year */}
-                      <span className="text-right text-[18px] font-normal text-black font-sans">
+                      <span className="text-right text-[16px] font-normal text-black font-sans">
                         {project.year}
                       </span>
 
@@ -152,7 +152,7 @@ export default function SelectedWork() {
                       top: `${stickyTop + headerHeight}px`,
                       zIndex: imageZIndex,
                     }}
-                    className="project-image-wrapper w-full h-[350px] md:h-[600px] overflow-hidden bg-[#eeeeee] shadow-sm ml-0 mr-auto pointer-events-auto"
+                    className="project-image-wrapper w-full overflow-hidden bg-[#eeeeee] shadow-sm ml-0 mr-auto pointer-events-auto"
                   >
                     <img
                       src={project.image}
@@ -168,9 +168,8 @@ export default function SelectedWork() {
                       top: `${stickyTop + headerHeight + 236}px`,
                       zIndex: imageZIndex + 1,
                     }}
-                    className={`project-btn-wrapper w-full flex items-center ${
-                      index % 2 === 0 ? 'justify-start' : 'justify-end'
-                    } px-6 md:px-12 lg:px-24 pointer-events-none`}
+                    className={`project-btn-wrapper w-full flex items-center ${index % 2 === 0 ? 'justify-start' : 'justify-end'
+                      } px-6 md:px-12 lg:px-24 pointer-events-none`}
                   >
                     <div
                       className="view-project-btn w-24 h-24 md:w-32 md:h-32 rounded-full border border-neutral-200/60 bg-white shadow-md flex items-center justify-center cursor-pointer group hover:scale-105 hover:border-neutral-900 transition-all duration-300 pointer-events-auto"
@@ -192,9 +191,8 @@ export default function SelectedWork() {
             <div key={project.id} className="contents">
               {/* Card Main Body spacer (purely for ScrollTrigger height tracking) */}
               <div
-                className={`project-card w-full py-0 bg-transparent relative border-b border-transparent ${
-                  index === 0 ? 'min-h-[35vh]' : 'min-h-[120vh]'
-                }`}
+                className={`project-card w-full py-0 bg-transparent relative border-b border-transparent ${index === 0 ? 'min-h-[35vh]' : 'min-h-[120vh]'
+                  }`}
               />
             </div>
           );

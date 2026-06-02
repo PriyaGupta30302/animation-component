@@ -29,10 +29,10 @@ export function useSelectedWorkAnimation(containerRef: RefObject<HTMLDivElement 
     // Set initial states
     wrappers.forEach((wrapper: any, idx: number) => {
       if (wrapper) {
-        const H = wrapper.offsetHeight || 600;
-        const headerHeight = 50;
+        const headerHeight = 44;
         const stickyTop = (idx + 1) * headerHeight;
         const Y = stickyTop + headerHeight;
+        const H = window.innerHeight - Y; // Fill remaining viewport below stacked headers
 
         gsap.set(wrapper, {
           width: '0%',
@@ -44,10 +44,10 @@ export function useSelectedWorkAnimation(containerRef: RefObject<HTMLDivElement 
           marginRight: 'auto',
         });
 
-        // Initialize header to bottom edge of active slot
+        // Initialize header: card 0 at its stickyTop, future cards hidden just below viewport
         if (headers[idx]) {
           gsap.set(headers[idx], {
-            top: idx === 0 ? `${stickyTop}px` : `${Y + H - headerHeight}px`,
+            top: idx === 0 ? `${stickyTop}px` : `${window.innerHeight + 1}px`,
           });
         }
       }
@@ -69,10 +69,10 @@ export function useSelectedWorkAnimation(containerRef: RefObject<HTMLDivElement 
 
       if (!wrapper) continue;
 
-      const headerHeight = 50;
+      const headerHeight = 44;
       const stickyTop = (i + 1) * headerHeight;
       const Y = stickyTop + headerHeight;
-      const H = wrapper.offsetHeight || 600;
+      const H = window.innerHeight - Y; // Fill remaining viewport below stacked headers
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -162,7 +162,11 @@ export function useSelectedWorkAnimation(containerRef: RefObject<HTMLDivElement 
             top: `${stickyTop}px`,
             duration: 0.8,
             ease: 'none',
-          }, 0.1);
+          }, 0.1)
+          // While floating in (crossover) → light gray border
+          .set(headers[i], { borderBottomColor: '#dddddd' }, 0.1)
+          // Once settled into the stack → back to black
+          .set(headers[i], { borderBottomColor: '#111111' }, 0.9);
         }
 
 
