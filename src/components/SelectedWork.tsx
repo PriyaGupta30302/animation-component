@@ -191,7 +191,11 @@ export default function SelectedWork() {
           return (
             <div key={project.id} className="contents">
               {/* Card Main Body spacer (purely for ScrollTrigger height tracking) */}
-              <div className="project-card w-full py-0 bg-transparent relative border-b border-transparent min-h-[120vh]" />
+              <div
+                className={`project-card w-full py-0 bg-transparent relative border-b border-transparent ${
+                  index === 0 ? 'min-h-[35vh]' : 'min-h-[120vh]'
+                }`}
+              />
             </div>
           );
         })}

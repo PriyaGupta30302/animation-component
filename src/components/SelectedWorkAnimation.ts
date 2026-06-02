@@ -37,7 +37,7 @@ export function useSelectedWorkAnimation(containerRef: RefObject<HTMLDivElement 
         gsap.set(wrapper, {
           width: '0%',
           height: '0px',
-          top: `${Y + H}px`, // Starts at the bottom-left corner of its active slot
+          top: idx === 0 ? `${Y}px` : `${Y + H}px`, // Card 0 starts directly under its header
           left: '0',
           right: 'auto',
           marginLeft: '0',
@@ -77,8 +77,8 @@ export function useSelectedWorkAnimation(containerRef: RefObject<HTMLDivElement 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: cards[i] as HTMLElement,
-          start: `top top+=${stickyTop}`,
-          end: `bottom top+=${stickyTop}`,
+          start: i === 0 ? 'top bottom' : `top top+=${stickyTop}`,
+          end: i === 0 ? `top top+=${stickyTop}` : `bottom top+=${stickyTop}`,
           scrub: 2,
         }
       });
@@ -89,7 +89,7 @@ export function useSelectedWorkAnimation(containerRef: RefObject<HTMLDivElement 
           width: '100%',
           height: `${H}px`,
           top: `${Y}px`,
-          duration: 0.6,
+          duration: 1.0,
           ease: 'none',
         }, 0);
 
@@ -97,13 +97,10 @@ export function useSelectedWorkAnimation(containerRef: RefObject<HTMLDivElement 
           tl.to(btn, {
             scale: 1,
             opacity: 1,
-            duration: 0.6,
+            duration: 1.0,
             ease: 'none',
           }, 0);
         }
-
-        // Active Stay (0.6 to 1.0)
-        tl.to({}, { duration: 0.4 }, 0.6);
 
       } else {
         // --- Card i (i > 0): Symmetrical crossover of Card i-1 and Card i ---
