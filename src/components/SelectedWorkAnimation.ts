@@ -26,13 +26,8 @@ export function useSelectedWorkAnimation(containerRef: RefObject<HTMLDivElement 
     const buttons = cards.map((card: any) => card.querySelector('.view-project-btn'));
 
     // Set initial states
-    wrappers.forEach((wrapper: any, idx: number) => {
-      if (!wrapper) return;
-      if (idx === 0) {
-        gsap.set(wrapper, { width: '40%', marginLeft: '0', marginRight: 'auto' });
-      } else {
-        gsap.set(wrapper, { width: '0%', marginLeft: '0', marginRight: 'auto' });
-      }
+    wrappers.forEach((wrapper: any) => {
+      if (wrapper) gsap.set(wrapper, { clipPath: 'polygon(0% 100%, 0% 100%, 0% 100%, 0% 100%)' });
     });
 
     gsap.set('.header-thumbnail', { scale: 0, opacity: 0 });
@@ -41,88 +36,114 @@ export function useSelectedWorkAnimation(containerRef: RefObject<HTMLDivElement 
       if (btn) gsap.set(btn, { scale: 0, opacity: 0 });
     });
 
-    // --- TIMELINE 1: First Card Entrance ---
-    const firstWrapper = wrappers[0];
-    const firstBtn = buttons[0];
-    if (firstWrapper) {
-      const tl1 = gsap.timeline({
-        scrollTrigger: {
-          trigger: cards[0] as HTMLElement,
-          start: 'top top+=50',
-          end: 'bottom-=20% top+=50',
-          scrub: 2,
-        }
-      });
+    // --- Dynamic 3-Phase Animation Loop for all cards ---
+    for (let i = 0; i < cards.length; i++) {
+      const wrapper = wrappers[i];
+      const thumbnail = thumbnails[i];
+      const btn = buttons[i];
 
-      tl1.to(firstWrapper, {
-        width: '100%',
-        ease: 'none',
-      }, 0);
-
-      if (firstBtn) {
-        tl1.to(firstBtn, {
-          scale: 1,
-          opacity: 1,
-          ease: 'none',
-        }, 0);
-      }
-    }
-
-    // --- TIMELINES FOR SUBSEQUENT CARDS (Exit of i-1 / Entrance of i) ---
-    for (let i = 1; i < cards.length; i++) {
-      const prevWrapper = wrappers[i - 1];
-      const currWrapper = wrappers[i];
-      const prevThumbnail = thumbnails[i - 1];
-      const prevBtn = buttons[i - 1];
-      const currBtn = buttons[i];
-
-      if (!prevWrapper || !currWrapper) continue;
+      if (!wrapper) continue;
 
       const headerHeight = 50;
-      const stickyTop = (i + 1) * headerHeight;
+      const stickyTop = (i * headerHeight) + 50;
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: cards[i] as HTMLElement,
-          start: 'top bottom-=200px',
-          end: `top top-=${stickyTop + 100}px`,
+          start: `top top+=${stickyTop}`,
+          end: `bottom top+=${stickyTop}`,
           scrub: 2,
         }
       });
 
-      tl.set(prevWrapper, { marginLeft: 'auto', marginRight: '0' }, 0)
-        .set(currWrapper, { marginLeft: '0', marginRight: 'auto' }, 0)
-        .to(prevWrapper, {
-          width: '0%',
-          ease: 'none',
-        }, 0)
-        .to(currWrapper, {
-          width: '100%',
-          ease: 'none',
-        }, 0);
+      if (i === 0) {
+        // --- Card 0 (Eon Studio): First Card Special Entrance ---
+        // 1. Entrance (0.0 to 0.4): grows diagonally from bottom-left corner to full-bleed
+        tl.fromTo(wrapper,
+          { clipPath: 'polygon(0% 100%, 0% 100%, 0% 100%, 0% 100%)' },
+          {
+            clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+            duration: 0.4,
+            ease: 'none',
+          },
+          0
+        );
 
-      if (prevThumbnail) {
-        tl.to(prevThumbnail, {
-          scale: 1,
-          opacity: 1,
-          ease: 'none',
-        }, 0);
-      }
+        if (btn) {
+          tl.to(btn, {
+            scale: 1,
+            opacity: 1,
+            duration: 0.4,
+            ease: 'none',
+          }, 0);
+        }
 
-      if (prevBtn) {
-        tl.to(prevBtn, {
-          scale: 0,
-          opacity: 0,
-          ease: 'none',
-        }, 0);
-      }
+        // 2. Active Stay (0.4 to 1.0): remains fully visible
+        tl.to({}, { duration: 0.6 }, 0.4);
 
-      if (currBtn) {
-        tl.to(currBtn, {
-          scale: 1,
-          opacity: 1,
-          ease: 'none',
-        }, 0);
+      } else {
+        // --- Subsequent Cards (Index i > 0): Exit of i-1 & Entrance of i ---
+        const prevWrapper = wrappers[i - 1];
+        const prevThumbnail = thumbnails[i - 1];
+        const prevBtn = buttons[i - 1];
+
+        // 1. Initial Stay (0.0 to 0.2): prev card remains fully visible
+        tl.to({}, { duration: 0.2 }, 0);
+
+        // 2. The Symmetrical Crossover (0.2 to 0.8):
+        // prev wrapper shrinks diagonally towards the bottom-right corner
+        // current wrapper grows diagonally from the bottom-left corner
+        if (prevWrapper) {
+          tl.fromTo(prevWrapper,
+            { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' },
+            {
+              clipPath: 'polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%)',
+              duration: 0.6,
+              ease: 'none',
+            },
+            0.2
+          );
+        }
+
+        tl.fromTo(wrapper,
+          { clipPath: 'polygon(0% 100%, 0% 100%, 0% 100%, 0% 100%)' },
+          {
+            clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+            duration: 0.6,
+            ease: 'none',
+          },
+          0.2
+        );
+
+        if (prevThumbnail) {
+          tl.to(prevThumbnail, {
+            scale: 1,
+            opacity: 1,
+            duration: 0.6,
+            ease: 'none',
+          }, 0.2);
+        }
+
+        if (prevBtn) {
+          tl.to(prevBtn, {
+            scale: 0,
+            opacity: 0,
+            duration: 0.6,
+            ease: 'none',
+          }, 0.2);
+        }
+
+        if (btn) {
+          tl.to(btn, {
+            scale: 1,
+            opacity: 1,
+            duration: 0.6,
+            ease: 'none',
+          }, 0.2);
+        }
+
+        // 3. Final Active Stay (0.8 to 1.0): current card remains fully visible
+        tl.to({}, { duration: 0.2 }, 0.8);
       }
     }
 

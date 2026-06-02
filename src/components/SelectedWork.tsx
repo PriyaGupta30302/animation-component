@@ -145,7 +145,7 @@ export default function SelectedWork() {
               </div>
 
               {/* Card Main Body content (large full-width image & overlay button) */}
-              <div className="project-card w-full py-0 bg-[#fcfcfc]/50 relative border-b border-[#eeeeee] min-h-[160vh]">
+              <div className="project-card w-full py-0 bg-[#fcfcfc]/50 relative border-b border-[#eeeeee] min-h-[220vh]">
                 {/* Large Image Frame (Scales and shrinks based on scroll position) */}
                 <div
                   style={{
@@ -153,7 +153,7 @@ export default function SelectedWork() {
                     top: `${stickyTop + headerHeight}px`,
                     zIndex: imageZIndex,
                   }}
-                  className="project-image-wrapper w-full h-[350px] md:h-[600px] overflow-hidden bg-[#eeeeee] shadow-sm relative ml-0 mr-auto"
+                  className="project-image-wrapper w-full h-[350px] md:h-[600px] overflow-hidden bg-[#eeeeee] shadow-sm relative"
                 >
                   <img
                     src={project.image}
