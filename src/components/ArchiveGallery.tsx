@@ -14,7 +14,7 @@ gsap.registerPlugin(ScrollTrigger);
 //  img3: left:26vw,  top: 68vh,  W:16vw, H:14vh → left-bottom:  (26vw, 82vh)
 //  img4: left:12vw,  top: 82vh,  W:14vw, H:12vh → right-bottom: (26vw, 94vh)
 //  img5: left:26vw,  bottom:6vh, W:56vw, H:22vh ← bottom=94vh = img4 right-bottom ✓
-//
+// 
 //  Touch proof:
 //    img2.left(42) = img1.left+W(4+38=42)  ✓   img2.top(44) = img1.top+H(10+34=44) ✓
 //    img3.right(42)= img2.left(42)         ✓   img3.top(68) = img2.top+H(44+24=68) ✓
